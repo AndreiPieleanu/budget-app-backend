@@ -10,6 +10,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private Integer id;
 
     @Setter
@@ -23,5 +24,6 @@ public class User {
     @Getter
     private boolean enabled = false; // email confirmed
 
+    @Getter
     private String role = "USER";
 }

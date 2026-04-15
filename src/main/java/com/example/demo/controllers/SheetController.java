@@ -1,5 +1,7 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.SheetDTO;
+import com.example.demo.dto.SheetRequest;
 import com.example.demo.entity.Sheet;
 import com.example.demo.service.SheetService;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +19,13 @@ public class SheetController {
     }
 
     @PostMapping
-    public ResponseEntity<Sheet> create(@RequestBody Sheet sheet) {
-        return ResponseEntity.ok(sheetService.create(sheet));
+    public ResponseEntity<SheetDTO> create(@RequestBody SheetRequest request) {
+        return ResponseEntity.ok(sheetService.create(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Sheet> update(@PathVariable Integer id, @RequestBody Sheet sheet) {
-        return sheetService.update(id, sheet)
+    public ResponseEntity<SheetDTO> update(@PathVariable Integer id, @RequestBody SheetRequest request) {
+        return sheetService.update(id, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -35,7 +37,12 @@ public class SheetController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Sheet>> getAllSheets(){
+    public ResponseEntity<List<SheetDTO>> getAllSheets(){
         return ResponseEntity.ok(sheetService.getAllSheets());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SheetDTO> getSheet(@PathVariable Integer id){
+        return ResponseEntity.ok(sheetService.getSheet(id));
     }
 }

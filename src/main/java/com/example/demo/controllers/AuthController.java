@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.dto.AuthRequest;
 import com.example.demo.dto.AuthResponse;
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.dto.UserDTO;
 import com.example.demo.entity.User;
 import com.example.demo.entity.VerificationToken;
 import com.example.demo.service.EmailService;
@@ -60,7 +61,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody AuthRequest req) {
-        User user = userService.findByEmail(req.getEmail());
+        UserDTO user = userService.findByEmail(req.getEmail());
 
         if(user == null){
             throw new RuntimeException("User does not exist!");
