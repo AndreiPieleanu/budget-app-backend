@@ -45,4 +45,8 @@ public class SheetController {
     public ResponseEntity<SheetDTO> getSheet(@PathVariable Integer id){
         return ResponseEntity.ok(sheetService.getSheet(id));
     }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<SheetDTO>> getAllSheetsOfUserWithId(@PathVariable Integer userId){
+        return ResponseEntity.ok(sheetService.getAllSheetsByUserId(userId));
+    }
 }

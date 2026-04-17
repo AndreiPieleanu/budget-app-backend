@@ -1,15 +1,14 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.AuthRequest;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.dto.UserDTO;
+import com.example.demo.dto.*;
 import com.example.demo.entity.User;
 import com.example.demo.entity.VerificationToken;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.JwtService;
 import com.example.demo.service.UserService;
 import com.example.demo.service.VerificationTokenService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +21,8 @@ public class AuthController {
     private final EmailService emailService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    @Value("${FRONTEND_URL}")
+    private String frontendUrl;
 
     public AuthController(UserService userService,
                           VerificationTokenService tokenService,
@@ -44,7 +45,7 @@ public class AuthController {
         emailService.send(
                 user.getEmail(),
                 "Confirm your account",
-                "http://localhost:3000/confirm?token=" + token
+                frontendUrl + "/confirm?token=" + token
         );
 
         return "User registered. Check email.";
@@ -75,8 +76,12 @@ public class AuthController {
             throw new RuntimeException("Email not confirmed");
         }
 
-        String token = jwtService.generate(user.getEmail());
+        String token = jwtService.generate(user);
 
         return new AuthResponse(token);
+    }
+    @PostMapping("/me")
+    public ResponseEntity<Integer> getUserIdByToken(@RequestBody UserRequest userRequest){
+        return ResponseEntity.ok(jwtService.extractUserId(userRequest));
     }
 }

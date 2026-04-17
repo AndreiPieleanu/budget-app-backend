@@ -51,4 +51,8 @@ public class UserService {
         user.setEnabled(true);
         userRepository.save(user);
     }
+
+    public Integer extractUserId(String token) {
+        return 1;
+    }
 }

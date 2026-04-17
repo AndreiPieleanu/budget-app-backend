@@ -7,4 +7,5 @@ import java.time.LocalDateTime;
 @Data
 public class SheetRequest {
     public String name;
+    public Integer userId;
 }
