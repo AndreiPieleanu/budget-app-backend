@@ -81,7 +81,7 @@ public class AuthController {
         return new AuthResponse(token);
     }
     @PostMapping("/me")
-    public ResponseEntity<Integer> getUserIdByToken(@RequestBody UserRequest userRequest){
-        return ResponseEntity.ok(jwtService.extractUserId(userRequest));
+    public ResponseEntity<Integer> getUserIdByToken(@RequestHeader("Authorization") String auth){
+        return ResponseEntity.ok(jwtService.extractUserId(auth));
     }
 }

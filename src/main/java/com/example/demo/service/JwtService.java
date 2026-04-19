@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -14,9 +15,8 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-
-    private static final String SECRET =
-            "E00GHNrLRbZccFOMM5DoGOcTA9aEVCUALor1xAkvO8I=";
+    @Value("${JWT_SECRET}")
+    private String SECRET;
 
     private static final long EXPIRATION = 1000L * 60 * 60 * 4;
 
@@ -50,6 +50,20 @@ public class JwtService {
 
     public Integer extractUserId(UserRequest request) {
         return extractAllClaims(request.getToken()).get("userId", Integer.class);
+    }
+
+    public String extractUserRole(String token){
+        return extractAllClaims(token).get("role", String.class);
+    }
+
+    public Integer extractUserId(String auth){
+        String token = auth;
+        if(auth.startsWith("Bearer ")){
+            token = auth.substring(7);
+        }
+        UserRequest userRequest = new UserRequest();
+        userRequest.setToken(token);
+        return extractUserId(userRequest);
     }
 
     public boolean isValid(String token) {

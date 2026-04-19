@@ -17,30 +17,40 @@ public class SourceController {
     public SourceController(SourceService sourceService){ this.sourceService = sourceService; }
 
     @PostMapping
-    public ResponseEntity<SourceDTO> create(@RequestBody SourceRequest source) {
-        return ResponseEntity.ok(sourceService.create(source));
+    public ResponseEntity<SourceDTO> create(
+            @RequestBody SourceRequest source,
+            @RequestHeader("Authorization") String auth) {
+        return ResponseEntity.ok(sourceService.create(source, auth));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SourceDTO> update(@PathVariable Integer id, @RequestBody SourceRequest source) {
-        return sourceService.update(id, source)
+    public ResponseEntity<SourceDTO> update(
+            @PathVariable Integer id,
+            @RequestBody SourceRequest source,
+            @RequestHeader("Authorization") String auth) {
+        return sourceService.update(id, source, auth)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        sourceService.delete(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable Integer id,
+            @RequestHeader("Authorization") String auth) {
+        sourceService.delete(id, auth);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/sheet/{id}")
-    public ResponseEntity<List<SourceDTO>> getSourcesOfSheet(@PathVariable Integer id){
-        List<SourceDTO> sources = sourceService.getSourcesFromSheetId(id);
+    public ResponseEntity<List<SourceDTO>> getSourcesOfSheet(
+            @PathVariable Integer id,
+            @RequestHeader("Authorization") String auth){
+        List<SourceDTO> sources = sourceService.getSourcesFromSheetId(id, auth);
         return ResponseEntity.ok(sources);
     }
     @GetMapping
-    public ResponseEntity<List<SourceDTO>> getAllSources(){
-        return ResponseEntity.ok(sourceService.getAllSources());
+    public ResponseEntity<List<SourceDTO>> getAllSources(
+            @RequestHeader("Authorization") String auth){
+        return ResponseEntity.ok(sourceService.getAllSources(auth));
     }
 }

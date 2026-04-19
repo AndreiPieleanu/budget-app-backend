@@ -2,7 +2,6 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.SheetDTO;
 import com.example.demo.dto.SheetRequest;
-import com.example.demo.entity.Sheet;
 import com.example.demo.service.SheetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,34 +18,34 @@ public class SheetController {
     }
 
     @PostMapping
-    public ResponseEntity<SheetDTO> create(@RequestBody SheetRequest request) {
-        return ResponseEntity.ok(sheetService.create(request));
+    public ResponseEntity<SheetDTO> create(@RequestBody SheetRequest request, @RequestHeader("Authorization") String auth) {
+        return ResponseEntity.ok(sheetService.create(request, auth));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SheetDTO> update(@PathVariable Integer id, @RequestBody SheetRequest request) {
-        return sheetService.update(id, request)
+    public ResponseEntity<SheetDTO> update(@PathVariable Integer id, @RequestBody SheetRequest request, @RequestHeader("Authorization") String auth) {
+        return sheetService.update(id, request, auth)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        sheetService.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Integer id, @RequestHeader("Authorization") String auth) {
+        sheetService.delete(id, auth);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<SheetDTO>> getAllSheets(){
-        return ResponseEntity.ok(sheetService.getAllSheets());
+    public ResponseEntity<List<SheetDTO>> getAllSheets(@RequestHeader("Authorization") String auth){
+        return ResponseEntity.ok(sheetService.getAllSheets(auth));
+    }
+    @GetMapping("/me")
+    public ResponseEntity<List<SheetDTO>> getMySheets(@RequestHeader("Authorization") String auth){
+        return ResponseEntity.ok(sheetService.getMySheets(auth));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SheetDTO> getSheet(@PathVariable Integer id){
-        return ResponseEntity.ok(sheetService.getSheet(id));
-    }
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<SheetDTO>> getAllSheetsOfUserWithId(@PathVariable Integer userId){
-        return ResponseEntity.ok(sheetService.getAllSheetsByUserId(userId));
+    public ResponseEntity<SheetDTO> getSheet(@PathVariable Integer id, @RequestHeader("Authorization") String auth){
+        return ResponseEntity.ok(sheetService.getSheet(id, auth));
     }
 }
