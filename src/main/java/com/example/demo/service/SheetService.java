@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.SheetDTO;
-import com.example.demo.dto.SheetRequest;
+import com.example.demo.request.SheetRequest;
 import com.example.demo.entity.Sheet;
 import com.example.demo.entity.User;
 import com.example.demo.repository.SheetRepository;

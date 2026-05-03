@@ -3,6 +3,8 @@ package com.example.demo.controllers;
 import com.example.demo.dto.*;
 import com.example.demo.entity.User;
 import com.example.demo.entity.VerificationToken;
+import com.example.demo.request.AuthRequest;
+import com.example.demo.response.AuthResponse;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.JwtService;
 import com.example.demo.service.UserService;
@@ -62,8 +64,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody AuthRequest req) {
+        long start = System.currentTimeMillis();
+        System.out.println("starting time!");
         UserDTO user = userService.findByEmail(req.getEmail());
-
+        System.out.println("time for finding user: " + (System.currentTimeMillis() - start) + "ms");
         if(user == null){
             throw new RuntimeException("User does not exist!");
         }
@@ -71,13 +75,13 @@ public class AuthController {
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
-
+        System.out.println("time for checking encoded password: " + (System.currentTimeMillis() - start) + "ms");
         if (!user.isEnabled()) {
             throw new RuntimeException("Email not confirmed");
         }
 
         String token = jwtService.generate(user);
-
+        System.out.println("time for generating token: " + (System.currentTimeMillis() - start) + "ms");
         return new AuthResponse(token);
     }
     @PostMapping("/me")

@@ -1,8 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.SourceDTO;
-import com.example.demo.dto.SourceRequest;
-import com.example.demo.entity.Source;
+import com.example.demo.request.SourceRequest;
 import com.example.demo.service.SourceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,5 +51,13 @@ public class SourceController {
     public ResponseEntity<List<SourceDTO>> getAllSources(
             @RequestHeader("Authorization") String auth){
         return ResponseEntity.ok(sourceService.getAllSources(auth));
+    }
+    @GetMapping("/convert")
+    public ResponseEntity<List<SourceDTO>> getConvertedSources(
+            @RequestHeader("Authorization") String auth,
+            @RequestParam String sheetId,
+            @RequestParam String currencyTo
+    ) {
+        return ResponseEntity.ok(sourceService.getConvertedSources(sheetId, currencyTo, auth));
     }
 }

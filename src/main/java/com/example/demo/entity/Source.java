@@ -1,6 +1,5 @@
 package com.example.demo.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,4 +31,7 @@ public class Source {
     @ManyToOne
     @JoinColumn(name = "sheet_id", nullable = false)
     private Sheet sheet;
+
+    @Column(length = 3)
+    private String currency = "HUF"; // EUR, USD, RON
 }

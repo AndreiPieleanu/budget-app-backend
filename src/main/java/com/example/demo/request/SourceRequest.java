@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.example.demo.request;
 
 import lombok.Data;
 
@@ -10,4 +10,5 @@ public class SourceRequest {
     private BigDecimal amount;
     private String description;
     private Integer sheetId;
+    private String currency;
 }

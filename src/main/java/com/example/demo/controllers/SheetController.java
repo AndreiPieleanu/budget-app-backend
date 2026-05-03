@@ -1,7 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.SheetDTO;
-import com.example.demo.dto.SheetRequest;
+import com.example.demo.request.SheetRequest;
 import com.example.demo.service.SheetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

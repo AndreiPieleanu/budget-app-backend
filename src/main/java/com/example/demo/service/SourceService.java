@@ -1,12 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.SourceDTO;
-import com.example.demo.dto.SourceRequest;
+import com.example.demo.request.SourceRequest;
 import com.example.demo.entity.Sheet;
 import com.example.demo.entity.Source;
 import com.example.demo.entity.Type;
 import com.example.demo.repository.SheetRepository;
 import com.example.demo.repository.SourceRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -19,17 +20,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class SourceService {
     private final SourceRepository sourceRepository;
     private final SheetRepository sheetRepository;
     private final JwtService jwtService;
-    public SourceService(SourceRepository sourceRepository, SheetRepository sheetRepository, JwtService jwtService){
-        this.sourceRepository = sourceRepository;
-        this.sheetRepository = sheetRepository;
-        this.jwtService = jwtService;
-    }
+    private final ExchangeRateService exchangeRateService;
 
-    @CacheEvict(value = {"sourcesBySheet", "allSources"}, allEntries = true)
+    @CacheEvict(value = {"sourcesBySheet", "allSources", "currencySources"}, allEntries = true)
     public SourceDTO create(SourceRequest request, String auth) {
         Sheet sheet = sheetRepository.findById(request.getSheetId())
                 .orElseThrow(() -> new RuntimeException("Sheet not found"));
@@ -44,6 +42,7 @@ public class SourceService {
                 .description(request.getDescription())
                 .createdAt(LocalDateTime.now())
                 .sheet(sheet)
+                .currency(request.getCurrency())
                 .build();
 
         Source created = sourceRepository.save(source);
@@ -51,7 +50,7 @@ public class SourceService {
         return mapToDTO(created);
     }
 
-    @CacheEvict(value = {"sourcesBySheet", "allSources"}, allEntries = true)
+    @CacheEvict(value = {"sourcesBySheet", "allSources", "currencySources"}, allEntries = true)
     public Optional<SourceDTO> update(Integer id, SourceRequest updated, String auth) {
         Integer userId = jwtService.extractUserId(auth);
         Optional<Source> optional = sourceRepository.findById(id);
@@ -65,13 +64,14 @@ public class SourceService {
         source.setType(Type.valueOf(updated.getType()));
         source.setAmount(updated.getAmount());
         source.setDescription(updated.getDescription());
+        source.setCurrency(updated.getCurrency());
 
         Source saved = sourceRepository.save(source);
 
         return Optional.of(mapToDTO(saved));
     }
 
-    @CacheEvict(value = {"sourcesBySheet", "allSources"}, allEntries = true)
+    @CacheEvict(value = {"sourcesBySheet", "allSources", "currencySources"}, allEntries = true)
     public void delete(Integer id, String auth) {
         Source source = sourceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Source not found"));
@@ -106,6 +106,7 @@ public class SourceService {
                 .amount(s.getAmount())
                 .description(s.getDescription())
                 .createdAt(s.getCreatedAt())
+                .currency(s.getCurrency())
                 .build();
     }
 
@@ -116,5 +117,17 @@ public class SourceService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         return sourceRepository.findAll().stream().map(this::mapToDTO).toList();
+    }
+
+    @Cacheable(value = "currencySources")
+    public List<SourceDTO> getConvertedSources(String sheetId, String currencyTo, String auth){
+        Integer userId = jwtService.extractUserId(auth);
+        Sheet sheet = sheetRepository.getReferenceById(Integer.parseInt(sheetId));
+        if(!sheet.getUser().getId().equals(userId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        List<SourceDTO> sources = sourceRepository.findBySheetId(sheet.getId()).stream().map(this::mapToDTO).toList();
+        List<SourceDTO> result = exchangeRateService.convertSources(sources, currencyTo);
+        return result;
     }
 }

@@ -26,5 +26,8 @@ public class SourceDTO implements Serializable {
     private String description;
 
     private LocalDateTime createdAt;
+
     private Integer sheetId;
+
+    private String currency;
 }

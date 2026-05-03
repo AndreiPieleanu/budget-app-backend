@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,8 +52,8 @@ public class UserService {
         user.setEnabled(true);
         userRepository.save(user);
     }
-
-    public Integer extractUserId(String token) {
-        return 1;
+    @PostConstruct
+    public void warmup() {
+        userRepository.findByEmail("warmup@example.com");
     }
 }
