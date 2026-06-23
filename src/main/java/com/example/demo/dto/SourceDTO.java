@@ -9,6 +9,7 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -30,4 +31,10 @@ public class SourceDTO implements Serializable {
     private Integer sheetId;
 
     private String currency;
+
+    private BigDecimal actualAmount;
+
+    private LocalDate possibleStartDate;
+
+    private LocalDate possibleEndDate;
 }

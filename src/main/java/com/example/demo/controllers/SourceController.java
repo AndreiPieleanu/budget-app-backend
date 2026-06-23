@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.SourceDTO;
+import com.example.demo.dto.TimelineItemDTO;
 import com.example.demo.request.SourceRequest;
 import com.example.demo.service.SourceService;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +59,14 @@ public class SourceController {
             @RequestParam String sheetId,
             @RequestParam String currencyTo
     ) {
-        return ResponseEntity.ok(sourceService.getConvertedSources(sheetId, currencyTo, auth));
+        return ResponseEntity.ok(
+                sourceService.getConvertedSources(sheetId, currencyTo, auth));
+    }
+    @GetMapping("/{sheetId}/timeline")
+    public ResponseEntity<List<TimelineItemDTO>> generateTimeline(
+            @RequestHeader("Authorization") String auth,
+            @PathVariable Integer sheetId
+    ){
+        return ResponseEntity.ok(sourceService.getTimeline(sheetId, auth));
     }
 }

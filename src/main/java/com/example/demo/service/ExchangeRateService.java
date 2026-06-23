@@ -90,6 +90,9 @@ public class ExchangeRateService {
                     .description(s.getDescription())
                     .amount(converted)
                     .currency(targetCurrency)
+                    .actualAmount(s.getActualAmount())
+                    .possibleStartDate(s.getPossibleStartDate())
+                    .possibleEndDate(s.getPossibleEndDate())
                     .build();
 
             return dto;

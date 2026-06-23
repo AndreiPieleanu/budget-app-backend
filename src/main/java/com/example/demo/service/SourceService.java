@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.SourceDTO;
+import com.example.demo.dto.TimelineItemDTO;
 import com.example.demo.request.SourceRequest;
 import com.example.demo.entity.Sheet;
 import com.example.demo.entity.Source;
@@ -14,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,6 +46,9 @@ public class SourceService {
                 .createdAt(LocalDateTime.now())
                 .sheet(sheet)
                 .currency(request.getCurrency())
+                .actualAmount(request.getActualAmount())
+                .possibleStartDate(request.getPossibleStartDate())
+                .possibleEndDate(request.getPossibleEndDate())
                 .build();
 
         Source created = sourceRepository.save(source);
@@ -65,6 +71,9 @@ public class SourceService {
         source.setAmount(updated.getAmount());
         source.setDescription(updated.getDescription());
         source.setCurrency(updated.getCurrency());
+        source.setActualAmount(updated.getActualAmount());
+        source.setPossibleStartDate(updated.getPossibleStartDate());
+        source.setPossibleEndDate(updated.getPossibleEndDate());
 
         Source saved = sourceRepository.save(source);
 
@@ -107,6 +116,9 @@ public class SourceService {
                 .description(s.getDescription())
                 .createdAt(s.getCreatedAt())
                 .currency(s.getCurrency())
+                .actualAmount(s.getActualAmount())
+                .possibleStartDate(s.getPossibleStartDate())
+                .possibleEndDate(s.getPossibleEndDate())
                 .build();
     }
 
@@ -129,5 +141,36 @@ public class SourceService {
         List<SourceDTO> sources = sourceRepository.findBySheetId(sheet.getId()).stream().map(this::mapToDTO).toList();
         List<SourceDTO> result = exchangeRateService.convertSources(sources, currencyTo);
         return result;
+    }
+
+    public List<TimelineItemDTO> getTimeline(Integer sheetId, String auth) {
+        Integer userId = jwtService.extractUserId(auth);
+        Sheet sheet = sheetRepository.getReferenceById(sheetId);
+        if(!sheet.getUser().getId().equals(userId)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        return sourceRepository.findBySheetId(sheetId)
+                .stream()
+                .sorted(Comparator.comparing(Source::getPossibleStartDate))
+                .map(source ->
+                        TimelineItemDTO.builder()
+                                .id(source.getId())
+                                .description(source.getDescription())
+                                .type(source.getType())
+                                .amount(getValue(source))
+                                .currency(source.getCurrency())
+                                .startDate(source.getPossibleStartDate())
+                                .endDate(source.getPossibleEndDate())
+                                .build()
+                )
+                .toList();
+    }
+    private BigDecimal getValue(Source s){
+        if(s.getActualAmount() != null && !s.getActualAmount().equals(BigDecimal.ZERO)){
+            return s.getActualAmount();
+        }
+        else{
+            return s.getAmount();
+        }
     }
 }

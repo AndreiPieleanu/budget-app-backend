@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -34,4 +35,10 @@ public class Source {
 
     @Column(length = 3)
     private String currency = "HUF"; // EUR, USD, RON
+
+    private BigDecimal actualAmount;
+
+    private LocalDate possibleStartDate;
+
+    private LocalDate possibleEndDate;
 }
